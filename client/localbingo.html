@@ -1,0 +1,174 @@
+<head>
+  <title>localbands</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="navbar">
+        <div class="span12">
+          <a class="brand" href="/">localbingo</a>
+          <ul class="nav pull-right">
+            <li>{{loginButtons}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    {{renderPage}}
+  </div>
+</body>
+
+<template name="home">
+  <table class="table">
+    {{#each topics}}
+      <tr>
+        <td>
+          <a href="/topic/{{slug}}">{{name}}</a>
+        </td>
+      </tr>
+    {{/each}}
+  </table>
+</template>
+
+<template name="admin">
+  {{> topic_new}}
+  <hr>
+  <table class="table">
+    {{#each admin_requests}}
+      {{> admin_request}}
+    {{/each}}
+  </table>
+</template>
+
+<template name="admin_request">
+  <tr>
+    <td>
+      {{name}}
+    </td>
+    <td>
+    <div class="btn btn-primary approve">Approve</div>
+    </td>
+    <td>
+      <div class="btn ignore">Ignore</div>
+    </td>
+  </tr>
+</template>
+
+<template name="topic">
+  <h4>{{topic.name}}</h4>
+  <p>{{topic.description}}</p>
+  <hr>
+  
+  <div class="things clearfix">
+    {{#each things}}
+      {{> thing}}
+    {{/each}}
+  </div>
+  
+  {{#if current_user.admin}}
+    <hr>
+    <a href="/topic/{{topic.slug}}/edit" class="btn">Edit Topic</a>
+  {{/if}}
+</template>
+
+<template name="thing">
+  <div class="thing {{completed_class}}">
+    {{name}}
+  </div>
+</template>
+
+<template name="topic_not_found">
+  <h3>That topic doesn't exist.</h3>
+  {{#if current_user.admin}}
+    <p>Would you like to create it?</p>
+    {{> topic_new}}
+  {{/if}}
+</template>
+
+<template name="topic_edit">
+  <h3>Editing Topic: {{topic.name}}</h3>
+  <div class="description">{{topic.description}}</div>
+  <table class="table">
+    {{#each things}}
+      <tr>
+        <td>
+          {{name}}
+        </td>
+        <td>
+          <a href="#" class="expire">Expire</a>
+        </td>
+        <td>
+          <a href="#" class="delete">Delete</a>
+        </td>
+      </tr>
+    {{/each}}
+  </table>
+  
+  {{> thing_new}}
+  <a href="/topic/{{topic.slug}}" role="button" class="btn">Back</a>
+</template>
+
+
+<template name="topic_new">
+  <a href="#new_topic_modal" role="button" data-toggle="modal" class="btn">Create A New Topic</a>
+  <div id="new_topic_modal" class="modal hide fade new_topic">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>Add A Topic</h3>
+    </div>
+    <div class="modal-body">
+      <form class="form">
+        <div class="control-group">
+          <label class="control-label">Topic Name:</label>
+          <div class="controls">
+            <input type="text" class="name" placeholder="Local Bands" />
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Description</label>
+          <div class="controls">
+            <input type="text" class="description" />
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">URL Slug</label>
+          <div class="controls">
+            <input type="text" class="slug" placeholder="bands" />
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn btn-primary save">Save</a>
+    </div>
+  </div>
+</template>
+
+<template name="thing_new">
+  <a href="#new_thing_modal" role="button" data-toggle="modal" class="btn">Add A New Thing To This Topic</a>
+  <div id="new_thing_modal" class="modal hide fade new_thing">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>Add A thing</h3>
+    </div>
+    <div class="modal-body">
+      <form class="form">
+        <div class="control-group">
+          <label class="control-label">Name:</label>
+          <div class="controls">
+            <input type="text" class="name" placeholder="Duck Fat" />
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn btn-primary save">Save</a>
+    </div>
+  </div>
+</template>
+
+<template name="permission_denied">
+  You do not have permission to view this page.
+</template>
+
