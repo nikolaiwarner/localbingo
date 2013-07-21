@@ -12,44 +12,35 @@ Meteor.autosubscribe ->
 Meteor.Router.add
   '/': 'home'
   '/admin': ->
-    if Meteor.user().admin
+    if is_admin()
       'admin'
     else
       'permission_denied'
   '/topic/:topic':
     as: 'topic'
     to: (topic) ->
-      if !Topics.findOne({slug:topic})
-        console.log 'topic_not_found'
-        return 'topic_not_found'
-      'topic'
-    and: (topic) ->
       Session.set 'topic', topic
+      if !Topics.findOne({slug:topic})
+        'topic_not_found'
+      else
+        'topic'
   '/topic/:topic/edit': (topic) ->
-    if Meteor.user().admin
+    if is_admin()
       Session.set 'topic', topic
       'topic_edit'
     else
       'permission_denied'
 
-###
-Meteor.Router.filters
-  'checkTopicExists': (topic) ->
-    console.log(topic)
-    if !Topics.findOne({slug:topic})
-      return '/topic/'+topic+'/edit'
-    '/topic/'+topic
-
-Meteor.Router.filter('checkTopicExists', {only: '/:topic'})
-###
-
 
 current_topic = ->
-  Topics.findOne {slug:Session.get('topic')}
+  Topics.findOne {slug: Session.get('topic')}
 
 user_has_completed_thing = (thing) ->
   Actions.findOne {thing_id: thing._id, user_id: Meteor.userId()}
-  
+
+is_admin = ->
+  Roles.userIsInRole(Meteor.user(), "admin")
+
 
 Template.home.helpers
   topics: ->
@@ -67,6 +58,11 @@ Template.admin.events
       slug: $('.new_topic .slug').val()
     Topics.insert data
     $('#new_topic_modal').modal('hide')
+
+Template.topic_edit_things_item.events
+  "click .topic_edit_things_item .delete": ->
+    console.log 'topic_edit_things_item', @
+    Things.remove @_id
 
 Template.admin_request.events
   "click .approve": ->
@@ -88,7 +84,7 @@ Template.thing.helpers
     if user_has_completed_thing(@)
       'completed'
 
-  
+
 Template.topic.events
   "click .thing": ->
     if user_has_completed_thing(@)
@@ -107,16 +103,15 @@ Template.topic_edit.helpers
     current_topic()
   things: ->
     if topic = current_topic()
-      Things.find {topic_id: topic._id}
+      Things.find {topic_id: topic._id}, {sort: {'name': 1}}
 
 
 Template.topic_edit.events
   "click .new_thing .save": ->
-    console.log current_topic()
     data =
       topic_id: current_topic()._id
       name: $('.new_thing .name').val()
       created_at: Date.now()
-    Things.insert data
-    console.log data
-    $('#new_thing_modal').modal('hide')
+    Things.insert data, ->
+      $('.new_thing .name').val("")
+

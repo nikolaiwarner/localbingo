@@ -1,5 +1,9 @@
+body {
+  padding-top: 80px;
+}
+
 .things {
-    
+
   .thing {
     cursor: pointer;
     float: left;
@@ -10,16 +14,27 @@
     text-align: center;
     overflow: hidden;
     background-color: #fff;
-    transition: background-color 1s;
-    -webkit-transition: background-color 1s;
-    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
     &.completed {
       background-color: green;
       color: #fff;
     }
-    
+
     &:hover {
       outline: 1px solid #000;
     }
+  }
+}
+
+#login-buttons {
+  color: #fff;
+
+  #login-buttons-logout {
+    cursor: pointer;
   }
 }
