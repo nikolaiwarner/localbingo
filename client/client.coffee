@@ -83,6 +83,24 @@ Template.thing.helpers
   completed_class: ->
     if user_has_completed_thing(@)
       'completed'
+  completed_date: ->
+    if action = user_has_completed_thing(@)
+      moment(action.created_at).fromNow()
+
+
+Template.topic.rendered = ->
+  things_count = $('.thing').length
+  $('.things').width((($('.thing').width() * things_count) / 2))
+
+  # Fill out extra squares so it looks more like a cube
+  #side = Math.ceil(Math.sqrt(things_count))
+  #side_squared = side * side
+  #extra_squares = side_squared - things_count
+  #console.log things_count, Math.sqrt(things_count)
+  #console.log side, side_squared, extra_squares
+  #$('.empty_square').remove()
+  #_(extra_squares).times ->
+  #  $('.things').append('<div class="empty_square"></div>')
 
 
 Template.topic.events
@@ -114,4 +132,3 @@ Template.topic_edit.events
       created_at: Date.now()
     Things.insert data, ->
       $('.new_thing .name').val("")
-

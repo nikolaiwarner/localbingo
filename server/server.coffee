@@ -9,9 +9,10 @@ Meteor.publish "topics", ->
 Meteor.publish "things", ->
   Things.find {}, {sort: {'name': 1}}
 Meteor.publish "actions", ->
-  Actions.find {}
+  Actions.find {user_id: this.userId}
 Meteor.publish "adminRequests", ->
-  AdminRequests.find {}
+  if is_admin(this.userId)
+    AdminRequests.find {}
 
 
 Meteor.startup ->
@@ -23,47 +24,50 @@ Meteor.startup ->
     user = Meteor.users.findOne({})
     Roles.addUsersToRoles(user._id, ["admin"]);
 
-is_admin = ->
-  Roles.userIsInRole(Meteor.user(), "admin")
+is_admin = (user_id) ->
+  user_id = user_id || Meteor.userId()
+  user_id && Roles.userIsInRole(user_id, "admin")
 
 Topics.allow
   insert: (userId, doc) ->
-    is_admin?
+    is_admin()?
   remove: (userId, doc) ->
-    is_admin?
+    is_admin()?
   update: (userId, docs, fields, modifier) ->
-    is_admin?
+    is_admin()?
 
 Things.allow
   insert: (userId, doc) ->
-    is_admin?
+    is_admin()?
   remove: (userId, doc) ->
-    is_admin?
+    is_admin()?
   update: (userId, docs, fields, modifier) ->
-    is_admin?
+    is_admin()?
 
 Actions.allow
   insert: (userId, doc) ->
     userId && doc.user_id == userId
   remove: (userId, doc) ->
     userId && doc.user_id == userId
+  update: (userId, docs, fields, modifier) ->
+    false
 
 AdminRequests.allow
   insert: (userId, doc) ->
     true
   remove: (userId, doc) ->
-    is_admin?
+    is_admin()?
   update: (userId, docs, fields, modifier) ->
-    is_admin?
+    is_admin()?
 
 
 approve_admin_request = (admin_request_id) ->
-  if is_admin?
+  if is_admin()?
     admin_request = AdminRequest.findOne admin_request_id
     Meteor.users.update Meteor.userId, {admin: true}
     AdminRequest.remove admin_request_id
 
 ignore_admin_request = (admin_request_id) ->
-  if is_admin?
+  if is_admin()?
     AdminRequest.remove admin_request_id
 

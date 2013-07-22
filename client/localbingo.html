@@ -68,7 +68,14 @@
 </template>
 
 <template name="topic">
-  <h4>{{topic.name}}</h4>
+  <h1>
+    {{topic.name}}
+    {{#if isInRole 'admin'}}
+      <small>
+        <a href="/topic/{{topic.slug}}/edit" class="btn">Edit</a>
+      </small>
+    {{/if}}
+  </h1>
   <p>{{topic.description}}</p>
   <hr>
 
@@ -87,6 +94,7 @@
 <template name="thing">
   <div class="thing {{completed_class}}">
     {{name}}
+    <div class="date">{{completed_date}}</div>
   </div>
 </template>
 
